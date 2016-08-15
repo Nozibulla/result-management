@@ -1,0 +1,36 @@
+a{
+	color: #1A0DB3;
+}
+
+.btn {
+	margin-right: 5px;
+	margin-top: 6px;
+}
+
+.table > tbody > tr > td {
+	vertical-align: middle;
+}
+
+/* Absolute Center Spinner */
+.load {
+	position: fixed;
+	z-index: 999;
+	height: 2em;
+	width: 2em;
+	margin: auto;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+}
+
+.overlay {
+	content: '';
+	display: block;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.3);
+}
