@@ -2,112 +2,44 @@
 <html>
 <head>
 	<link href="/css/bootstrap.min.css" rel="stylesheet">
-
 	<link href="/fonts/css/font-awesome.min.css" rel="stylesheet">
-
 	<link href="/css/animate.min.css" rel="stylesheet">
-
 	<!-- Custom styling plus plugins -->
-
 	<!-- <link href="/css/custom.css" rel="stylesheet"> -->
-
 	<link href="/css/app.css" rel="stylesheet">
 	<title>Indivisual Result</title>
 </head>
 <body>
-
-
-
 	<div class="indivisual_results">
-
 		<div class="student_info">
-
 			<h2><strong>Name: </strong>{{ $student->name }} |
 				<strong>Roll: </strong> {{ $student->roll }} |
 				<strong>Class: </strong>{{ $student->class }} |
 				<strong>Batch: </strong>{{ $student->batch }} |
 				<strong>Shift: </strong>{{ $student->shift }} |
 				<strong>Month: </strong>{{ $month }}</h2>
-
 			</div>
-
-
-
 			<div class="row">
-
 				@include('modals.editResultModal')
 				@include('modals.deleteResult')
-
 				<div class="col-md-12">
-
 					<div class="result_list">
-
 						@if (count($indivisual_results)>0)
-
 						<div class="table-responsive">
-
 							<table class="table">
-
 								<tr class="success">
 									<td></td>
-
 									<td></td>
-
 									<td>Month</td>
-
 									<!-- <td>Subject</td> -->
-
 									@for ($date = 1; $date < 32; $date++)
-
 									<td>{{ $date }}</td>
-
 									@endfor
-
 									<td>Inpercent</td>
-
 									<td>Grade</td>
-
 								</tr>
-
 								@foreach ($total_indivisual_results as $result)
-
 								<?php 
-
-								$counter =0;
-
-								if($result->one!=0)$counter++;
-								if($result->two!=0)$counter++;
-								if($result->three!=0)$counter++;
-								if($result->four!=0)$counter++;
-								if($result->five!=0)$counter++;
-								if($result->six!=0)$counter++;
-								if($result->seven!=0)$counter++;
-								if($result->eight!=0)$counter++;
-								if($result->nine!=0)$counter++;
-								if($result->ten!=0)$counter++;
-								if($result->eleven!=0)$counter++;
-								if($result->twelve!=0)$counter++;
-								if($result->thirteen!=0)$counter++;
-								if($result->fourteen!=0)$counter++;
-								if($result->fifteen!=0)$counter++;
-								if($result->sixteen!=0)$counter++;
-								if($result->seventeen!=0)$counter++;
-								if($result->eighteen!=0)$counter++;
-								if($result->nineteen!=0)$counter++;
-								if($result->twenty!=0)$counter++;
-								if($result->twentyone!=0)$counter++;
-								if($result->twentytwo!=0)$counter++;
-								if($result->twentythree!=0)$counter++;
-								if($result->twentyfour!=0)$counter++;
-								if($result->twentyfive!=0)$counter++;
-								if($result->twentysix!=0)$counter++;
-								if($result->twentyseven!=0)$counter++;
-								if($result->twentyeight!=0)$counter++;
-								if($result->twentynine!=0)$counter++;
-								if($result->thirty!=0)$counter++;
-								if($result->thirtyone!=0)$counter++;
-
-
 								$total_marks = $result->one +
 								$result->two +
 								$result->three +
@@ -139,13 +71,9 @@
 								$result->twentynine +
 								$result->thirty +
 								$result->thirtyone;
-
-								$gross_marks = $result->total_sUbject * 4;
-
+								$gross_marks = $result->total_subject * 4;
 								$in_percent = $total_marks * 100 / $gross_marks;
-
 								if ($in_percent>=91 && $in_percent<=100) {
-
 		                            $grade = 'A++';
 		                        }elseif ($in_percent>=81 && $in_percent<91) {
 		                           $grade = 'A+';
@@ -160,179 +88,67 @@
 		                        }else{
 		                            $grade = 'w/g';
 		                        }
-
-
-								/*$gradecalc = $in_percent / 10;
-
-								settype($gradecalc, "integer");
-
-								switch ($gradecalc) {
-
-									case 10:
-									$grade = 'A++';
-									break;
-
-									case 9:
-									$grade = 'A++';
-									break;
-
-									case 8:
-									$grade = 'A+';
-									break;
-
-									case 7:
-									$grade = 'A';
-									break;
-
-									case 6:
-									$grade = 'A-';
-									break;
-
-									case 5:
-									$grade = 'B';
-									break;
-
-									case 4:
-									$grade = 'C';
-									break;
-
-									case 3:
-									$grade = 'C';
-									break;
-
-									case 2:
-									$grade = 'C';
-									break;
-
-									case 1:
-									$grade = 'C';
-									break;
-
-									default:
-									$grade = 'w/g';
-									break;
-								}
-
-*/
-
-
 								?>
-
 								<tr>
-
 									<td >
 										<a href="#" class="edit_result" data-id="{{ $student->id }}" data-month="{{ $result->month }}"data-subject="{{ $result->subject }}">Edit</a>
 									</td>
-
 									<td >
 										<a href="#" class="delete_result" data-id="{{ $student->id }}" data-month="{{ $result->month }}" data-subject="{{ $result->subject }}">Delete</a>
 									</td>
-
 									<td>{{ $result->month }}</td>
-
 									<td>{{ $result->one }}</td>
-
 									<td>{{ $result->two }}</td>
-
 									<td>{{ $result->three }}</td>
-
 									<td>{{ $result->four }}</td>
-
 									<td>{{ $result->five }}</td>
-
 									<td>{{ $result->six }}</td>
-
 									<td>{{ $result->seven }}</td>
-
 									<td>{{ $result->eight }}</td>
-
 									<td>{{ $result->nine }}</td>
-
 									<td>{{ $result->ten }}</td>
-
 									<td>{{ $result->eleven }}</td>
-
 									<td>{{ $result->twelve }}</td>
-
 									<td>{{ $result->thirteen }}</td>
-
 									<td>{{ $result->fourteen }}</td>
-
 									<td>{{ $result->fifteen }}</td>
-
 									<td>{{ $result->sixteen }}</td>
-
 									<td>{{ $result->seventeen }}</td>
-
 									<td>{{ $result->eighteen }}</td>
-
 									<td>{{ $result->nineteen }}</td>
-
 									<td>{{ $result->twenty }}</td>
-
 									<td>{{ $result->twentyone }}</td>
-
 									<td>{{ $result->twentytwo }}</td>
-
 									<td>{{ $result->twentythree }}</td>
-
 									<td>{{ $result->twentyfour }}</td>
-
 									<td>{{ $result->twentyfive }}</td>
-
 									<td>{{ $result->twentysix }}</td>
-
 									<td>{{ $result->twentyseven }}</td>
-
 									<td>{{ $result->twentyeight }}</td>
-
 									<td>{{ $result->twentynine }}</td>
-
 									<td>{{ $result->thirty }}</td>
-
 									<td>{{ $result->thirtyone }}</td>
-
 									<td>{{ round($in_percent, 3) }}</td>
-
 									<td>{{ $grade }}</td>
-
 								</tr>
-
 								@endforeach
-
 							</table>
-
 						</div>
-
 						@else
-
 						<h5>Sorry No result available yet.</h5>
-
 						@endif
-
 						<br>
 						<h2>Gradesheet by Date</h2>
-
 						<div class="table-responsive" >
-
 							<table class="table table-striped">
-
 								<tr class="success">
-
 									<td></td>
-
 									@for ($date = 1; $date < 32; $date++)
-
 									<td>{{ $date }}</td>
-
 									@endfor
-
 								</tr>
-
 								<tr>
-
 									<td>Total</td>
-
 									<td>{{ $totalone }}</td>
 									<td>{{ $totaltwo }}</td>
 									<td>{{ $totalthree }}</td>
@@ -364,13 +180,9 @@
 									<td>{{ $totaltwentynine }}</td>
 									<td>{{ $totalthirty }}</td>
 									<td>{{ $totalthirtyone }}</td>
-
 								</tr>
-
 								<tr>
-
 									<td>InPercent</td>
-
 									<td>{{ round($inpercentone, 3) }}</td>
 									<td>{{ round($inpercenttwo, 3) }}</td>
 									<td>{{ round($inpercentthree, 3) }}</td>
@@ -402,11 +214,8 @@
 									<td>{{ round($inpercenttwentynine, 3) }}</td>
 									<td>{{ round($inpercentthirty, 3) }}</td>
 									<td>{{ round($inpercentthirtyone, 3) }}</td>
-
 								</tr><tr>
-
 								<td>Grade</td>
-
 								<td>{{ $gradeone }}</td>
 								<td>{{ $gradetwo }}</td>
 								<td>{{ $gradethree }}</td>
@@ -438,32 +247,15 @@
 								<td>{{ $gradetwentynine }}</td>
 								<td>{{ $gradethirty }}</td>
 								<td>{{ $gradethirtyone }}</td>
-
 							</tr>
-
-
 						</table>
 					</div>
-
-
-
-
-
 				</div>
-
 			</div>
-
 			<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-
 			<!-- <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script> -->
 			<script src="/js/bootstrap.min.js"></script>
 			<script src="/js/student.js"></script>
-
 		</div>
-
 	</body>
 	</html>
-
-
-
-

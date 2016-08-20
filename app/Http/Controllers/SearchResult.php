@@ -1,48 +1,34 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Dailyresult;
 use App\Http\Controllers\Controller;
 use App\Student;
 use DB;
 use Illuminate\Http\Request;
-
 class SearchResult extends Controller {
 	/**
 	 * View for search result from frontend.
 	 * @return
 	 */
 	public function searchResult() {
-
 		$months = Dailyresult::distinct()->lists('month', 'month');
-
 		$years = Student::distinct()->lists('year', 'year');
-
 		$classes = Student::distinct()->lists('class', 'class');
-
 		$batches = Student::distinct()->lists('batch', 'batch');
-
 		$shifts = Student::distinct()->lists('shift', 'shift');
-
 		return view('results/search_result', compact('months', 'classes', 'batches', 'shifts', 'years'));
 	}
-
 	/**
 	 * Fetch Search Result and Show then in a page to print
 	 */
-
 	public function fetchsearchResult(Request $request) {
-
 		$roll = $request->input('roll');
 		$class = $request->input('class');
 		$batch = $request->input('batch');
 		$shift = $request->input('shift');
 		$month = $request->input('month');
 		$year = $request->input('year');
-
 		// return compact('month', 'class', 'batch', 'shift', 'roll');
-
 		$results = Dailyresult::join('students', 'dailyresults.student_id', '=', 'students.id')
 		->select(
 			'students.name',
@@ -83,37 +69,7 @@ class SearchResult extends Controller {
 			DB::raw('SUM(twentynine) as twentynine'),
 			DB::raw('SUM(thirty) as thirty'),
 			DB::raw('SUM(thirtyone) as thirtyone'),
-			DB::raw('COUNT(NULLIF(one,0)) as subject_one'),
-			DB::raw('COUNT(NULLIF(two,0)) as subject_two'),
-			DB::raw('COUNT(NULLIF(three,0)) as subject_three'),
-			DB::raw('COUNT(NULLIF(four,0)) as subject_four'),
-			DB::raw('COUNT(NULLIF(five,0)) as subject_five'),
-			DB::raw('COUNT(NULLIF(six,0)) as subject_six'),
-			DB::raw('COUNT(NULLIF(seven,0)) as subject_seven'),
-			DB::raw('COUNT(NULLIF(eight,0)) as subject_eight'),
-			DB::raw('COUNT(NULLIF(nine,0)) as subject_nine'),
-			DB::raw('COUNT(NULLIF(ten,0)) as subject_ten'),
-			DB::raw('COUNT(NULLIF(eleven,0)) as subject_eleven'),
-			DB::raw('COUNT(NULLIF(twelve,0)) as subject_twelve'),
-			DB::raw('COUNT(NULLIF(thirteen,0)) as subject_thirteen'),
-			DB::raw('COUNT(NULLIF(fourteen,0)) as subject_fourteen'),
-			DB::raw('COUNT(NULLIF(fifteen,0)) as subject_fifteen'),
-			DB::raw('COUNT(NULLIF(sixteen,0)) as subject_sixteen'),
-			DB::raw('COUNT(NULLIF(seventeen,0)) as subject_seventeen'),
-			DB::raw('COUNT(NULLIF(eighteen,0)) as subject_eighteen'),
-			DB::raw('COUNT(NULLIF(nineteen,0)) as subject_nineteen'),
-			DB::raw('COUNT(NULLIF(twenty,0)) as subject_twenty'),
-			DB::raw('COUNT(NULLIF(twentyone,0)) as subject_twentyone'),
-			DB::raw('COUNT(NULLIF(twentytwo,0)) as subject_twentytwo'),
-			DB::raw('COUNT(NULLIF(twentythree,0)) as subject_twentythree'),
-			DB::raw('COUNT(NULLIF(twentyfour,0)) as subject_twentyfour'),
-			DB::raw('COUNT(NULLIF(twentyfive,0)) as subject_twentyfive'),
-			DB::raw('COUNT(NULLIF(twentysix,0)) as subject_twentysix'),
-			DB::raw('COUNT(NULLIF(twentyseven,0)) as subject_twentyseven'),
-			DB::raw('COUNT(NULLIF(twentyeight,0)) as subject_twentyeight'),
-			DB::raw('COUNT(NULLIF(twentynine,0)) as subject_twentynine'),
-			DB::raw('COUNT(NULLIF(thirty,0)) as subject_thirty'),
-			DB::raw('COUNT(NULLIF(thirtyone,0)) as subject_thirtyone'))
+			DB::raw('SUM(subject) as total_subject'))
 		->groupBy('student_id', 'month')
 		->where('month', '=', $month)
 		->where('class', '=', $class)
@@ -122,34 +78,24 @@ class SearchResult extends Controller {
 		->where('roll', '=', $roll)
 		->where('year', '=', $year)
 		->get();
-
 		if ($results->first()) {
-
 			$total_marks = $this->calculateTotalMarks($results);
-
 			$in_percent = $this->calculateInPercent($total_marks, $results);
-
 			$grade = $this->calculateGrade($in_percent);
-
 			return view('results/show_fetch_results', compact('results', 'total_marks', 'in_percent', 'grade'));
 		} else {
 			return view('errors/result_not_found');
 		}
-
 	}
-
 	public function showIndivisualResult(Request $request) {
-
 		$roll = $request->input('roll');
 		$class = $request->input('class');
 		$batch = $request->input('batch');
 		$shift = $request->input('shift');
 		$month = $request->input('month');
 		$year = $request->input('year');
-
 		// return compact('month', 'class', 'batch', 'shift', 'roll');
-
-		$indivisual_results = Dailyresult::join('students', 'dailyresults.student_id', '=', 'students.id')
+		$total_indivisual_results = Dailyresult::join('students', 'dailyresults.student_id', '=', 'students.id')
 		->select(
 			'students.name',
 			'students.class',
@@ -189,8 +135,9 @@ class SearchResult extends Controller {
 			DB::raw('SUM(twentyeight) as twentyeight'),
 			DB::raw('SUM(twentynine) as twentynine'),
 			DB::raw('SUM(thirty) as thirty'),
-			DB::raw('SUM(thirtyone) as thirtyone'))
-		->groupBy('student_id', 'month', 'subject')
+			DB::raw('SUM(thirtyone) as thirtyone'),
+			DB::raw('SUM(subject) as total_subject'))
+		->groupBy('student_id', 'month')
 		->where('year', '=', $year)
 		->where('month', '=', $month)
 		->where('roll', '=', $roll)
@@ -198,11 +145,8 @@ class SearchResult extends Controller {
 		->where('batch', '=', $batch)
 		->where('shift', '=', $shift)
 		->get();
-
 		$subjects = Dailyresult::distinct()->lists('subject');
-
 		$months = Dailyresult::distinct()->lists('month');
-
 		$totalone = 0;
 		$totaltwo = 0;
 		$totalthree = 0;
@@ -296,373 +240,167 @@ class SearchResult extends Controller {
 		$gradetwentynine = 'N/A';
 		$gradethirty = 'N/A';
 		$gradethirtyone = 'N/A';
-		$onecounter = 0;
-		$twocounter = 0;
-		$threecounter = 0;
-		$fourcounter = 0;
-		$fivecounter = 0;
-		$sixcounter = 0;
-		$sevencounter = 0;
-		$eightcounter = 0;
-		$ninecounter = 0;
-		$tencounter = 0;
-		$elevencounter = 0;
-		$twelvecounter = 0;
-		$thirteencounter = 0;
-		$fourteencounter = 0;
-		$fifteencounter = 0;
-		$sixteencounter = 0;
-		$seventeencounter = 0;
-		$eighteencounter = 0;
-		$nineteencounter = 0;
-		$twentycounter = 0;
-		$twentyonecounter = 0;
-		$twentytwocounter = 0;
-		$twentythreecounter = 0;
-		$twentyfourcounter = 0;
-		$twentyfivecounter = 0;
-		$twentysixcounter = 0;
-		$twentysevencounter = 0;
-		$twentyeightcounter = 0;
-		$twentyninecounter = 0;
-		$thirtycounter = 0;
-		$thirtyonecounter = 0;
 
-		foreach ($indivisual_results as $result) {
-
+		foreach ($total_indivisual_results as $result) {
 			if ($result->one > 0) {
-
 				$totalone += $result->one;
-
-				$onecounter++;
-
-				$inpercentone = $totalone * 100 / ($onecounter * 4);
-
+				$inpercentone = ($result->one * 100) / ($result->subject * 4);
 				$gradeone = $this->calculateGrade($inpercentone);
 			}
-
 			if ($result->two > 0) {
-
 				$totaltwo += $result->two;
-
-				$twocounter++;
-
-				$inpercenttwo = $totaltwo * 100 / ($twocounter * 4);
-
+				$inpercenttwo = ($result->two * 100) / ($result->subject * 4);
 				$gradetwo = $this->calculateGrade($inpercenttwo);
-
 			}
-
 			if ($result->three > 0) {
-
 				$totalthree += $result->three;
-
-				$threecounter++;
-
-				$inpercentthree = $totalthree * 100 / ($threecounter * 4);
-
+				$inpercentthree = $totalthree * 100 / ($result->subject * 4);
 				$gradethree = $this->calculateGrade($inpercentthree);
 			}
-
 			if ($result->four > 0) {
-
 				$totalfour += $result->four;
-
 				$fourcounter++;
-
-				$inpercentfour = $totalfour * 100 / ($fourcounter * 4);
-
+				$inpercentfour = $totalfour * 100 / ($result->subject * 4);
 				$gradefour = $this->calculateGrade($inpercentfour);
 			}
-
 			if ($result->five > 0) {
-
 				$totalfive += $result->five;
-
-				$fivecounter++;
-
-				$inpercentfive = $totalfive * 100 / ($fivecounter * 4);
-
+				$inpercentfive = $totalfive * 100 / ($result->subject * 4);
 				$gradefive = $this->calculateGrade($inpercentfive);
 			}
-
 			if ($result->six > 0) {
-
 				$totalsix += $result->six;
-
-				$sixcounter++;
-
-				$inpercentsix = $totalsix * 100 / ($sixcounter * 4);
-
+				$inpercentsix = $totalsix * 100 / ($result->subject * 4);
 				$gradesix = $this->calculateGrade($inpercentsix);
 			}
-
 			if ($result->seven > 0) {
-
 				$totalseven += $result->seven;
-
-				$sevencounter++;
-
-				$inpercentseven = $totalseven * 100 / ($sevencounter * 4);
-
+				$inpercentseven = $totalseven * 100 / ($result->subject * 4);
 				$gradeseven = $this->calculateGrade($inpercentseven);
 			}
-
 			if ($result->eight > 0) {
-
 				$totaleight += $result->eight;
-
-				$eightcounter++;
-
-				$inpercenteight = $totaleight * 100 / ($eightcounter * 4);
-
+				$inpercenteight = $totaleight * 100 / ($result->subject * 4);
 				$gradeeight = $this->calculateGrade($inpercenteight);
 			}
-
 			if ($result->nine > 0) {
-
 				$totalnine += $result->nine;
-
-				$ninecounter++;
-
-				$inpercentnine = $totalnine * 100 / ($ninecounter * 4);
-
+				$inpercentnine = $totalnine * 100 / ($result->subject * 4);
 				$gradenine = $this->calculateGrade($inpercentnine);
 			}
-
 			if ($result->ten > 0) {
-
 				$totalten += $result->ten;
-
-				$tencounter++;
-
-				$inpercentten = $totalten * 100 / ($tencounter * 4);
-
+				$inpercentten = $totalten * 100 / ($result->subject * 4);
 				$gradeten = $this->calculateGrade($inpercentten);
 			}
-
 			if ($result->eleven > 0) {
-
 				$totaleleven += $result->eleven;
-
-				$elevencounter++;
-
-				$inpercenteleven = $totaleleven * 100 / ($elevencounter * 4);
-
+				$inpercenteleven = $totaleleven * 100 / ($result->subject * 4);
 				$gradeeleven = $this->calculateGrade($inpercenteleven);
 			}
-
 			if ($result->twelve > 0) {
-
 				$totaltwelve += $result->twelve;
-
-				$twelvecounter++;
-
-				$inpercenttwelve = $totaltwelve * 100 / ($twelvecounter * 4);
-
+				$inpercenttwelve = $totaltwelve * 100 / ($result->subject * 4);
 				$gradetwelve = $this->calculateGrade($inpercenttwelve);
 			}
-
 			if ($result->thirteen > 0) {
-
 				$totalthirteen += $result->thirteen;
-
-				$thirteencounter++;
-
-				$inpercentthirteen = $totalthirteen * 100 / ($thirteencounter * 4);
-
+				$inpercentthirteen = $totalthirteen * 100 / ($result->subject * 4);
 				$gradethirteen = $this->calculateGrade($inpercentthirteen);
-
 			}
-
 			if ($result->fourteen > 0) {
-
 				$totalfourteen += $result->fourteen;
-
-				$fourteencounter++;
-
-				$inpercentfourteen = $totalfourteen * 100 / ($fourteencounter * 4);
-
+				$inpercentfourteen = $totalfourteen * 100 / ($result->subject * 4);
 				$gradefourteen = $this->calculateGrade($inpercentfourteen);
 			}
-
 			if ($result->fifteen > 0) {
-
 				$totalfifteen += $result->fifteen;
-
-				$fifteencounter++;
-
-				$inpercentfifteen = $totalfifteen * 100 / ($fifteencounter * 4);
-
+				$inpercentfifteen = $totalfifteen * 100 / ($result->subject * 4);
 				$gradefifteen = $this->calculateGrade($inpercentfifteen);
 			}
-
 			if ($result->sixteen > 0) {
-
 				$totalsixteen += $result->sixteen;
-
-				$sixteencounter++;
-
-				$inpercentsixteen = $totalsixteen * 100 / ($sixteencounter * 4);
-
+				$inpercentsixteen = $totalsixteen * 100 / ($result->subject * 4);
 				$gradesixteen = $this->calculateGrade($inpercentsixteen);
 			}
 			if ($result->seventeen > 0) {
-
 				$totalseventeen += $result->seventeen;
-
-				$seventeencounter++;
-
-				$inpercentseventeen = $totalseventeen * 100 / ($seventeencounter * 4);
-
+				$inpercentseventeen = $totalseventeen * 100 / ($result->subject * 4);
 				$gradeseventeen = $this->calculateGrade($inpercentseventeen);
 			}
 			if ($result->eighteen > 0) {
-
 				$totaleighteen += $result->eighteen;
-
-				$eighteencounter++;
-
-				$inpercenteighteen = $totaleighteen * 100 / ($eighteencounter * 4);
-
+				$inpercenteighteen = $totaleighteen * 100 / ($result->subject * 4);
 				$gradeeighteen = $this->calculateGrade($inpercenteighteen);
 			}
 			if ($result->nineteen > 0) {
-
 				$totalnineteen += $result->nineteen;
-
-				$nineteencounter++;
-
-				$inpercentnineteen = $totalnineteen * 100 / ($nineteencounter * 4);
-
+				$inpercentnineteen = $totalnineteen * 100 / ($result->subject * 4);
 				$gradenineteen = $this->calculateGrade($inpercentnineteen);
 			}
 			if ($result->twenty > 0) {
-
 				$totaltwenty += $result->twenty;
-
-				$twentycounter++;
-
-				$inpercenttwenty = $totaltwenty * 100 / ($twentycounter * 4);
-
+				$inpercenttwenty = $totaltwenty * 100 / ($result->subject * 4);
 				$gradetwenty = $this->calculateGrade($inpercenttwenty);
 			}
 			if ($result->twentyone > 0) {
-
 				$totaltwentyone += $result->twentyone;
-
-				$twentyonecounter++;
-
-				$inpercenttwentyone = $totaltwentyone * 100 / ($twentyonecounter * 4);
-
+				$inpercenttwentyone = $totaltwentyone * 100 / ($result->subject * 4);
 				$gradetwentyone = $this->calculateGrade($inpercenttwentyone);
 			}
 			if ($result->twentytwo > 0) {
-
 				$totaltwentytwo += $result->twentytwo;
-
-				$twentytwocounter++;
-
-				$inpercenttwentytwo = $totaltwentytwo * 100 / ($twentytwocounter * 4);
-
+				$inpercenttwentytwo = $totaltwentytwo * 100 / ($result->subject * 4);
 				$gradetwentytwo = $this->calculateGrade($inpercenttwentytwo);
 			}
 			if ($result->twentythree > 0) {
-
 				$totaltwentythree += $result->twentythree;
-
-				$twentythreecounter++;
-
-				$inpercenttwentythree = $totaltwentythree * 100 / ($twentythreecounter * 4);
-
+				$inpercenttwentythree = $totaltwentythree * 100 / ($result->subject * 4);
 				$gradetwentythree = $this->calculateGrade($inpercenttwentythree);
 			}
 			if ($result->twentyfour > 0) {
-
 				$totaltwentyfour += $result->twentyfour;
-
-				$twentyfourcounter++;
-
-				$inpercenttwentyfour = $totaltwentyfour * 100 / ($twentyfourcounter * 4);
-
+				$inpercenttwentyfour = $totaltwentyfour * 100 / ($result->subject * 4);
 				$gradetwentyfour = $this->calculateGrade($inpercenttwentyfour);
 			}
 			if ($result->twentyfive > 0) {
-
 				$totaltwentyfive += $result->twentyfive;
-
-				$twentyfivecounter++;
-
-				$inpercenttwentyfive = $totaltwentyfive * 100 / ($twentyfivecounter * 4);
-
+				$inpercenttwentyfive = $totaltwentyfive * 100 / ($result->subject * 4);
 				$gradetwentyfive = $this->calculateGrade($inpercenttwentyfive);
 			}
 			if ($result->twentysix > 0) {
-
 				$totaltwentysix += $result->twentysix;
-
-				$twentysixcounter++;
-
-				$inpercenttwentysix = $totaltwentysix * 100 / ($twentysixcounter * 4);
-
+				$inpercenttwentysix = $totaltwentysix * 100 / ($result->subject * 4);
 				$gradetwentysix = $this->calculateGrade($inpercenttwentysix);
 			}
 			if ($result->twentyseven > 0) {
-
 				$totaltwentyseven += $result->twentyseven;
-
-				$twentysevencounter++;
-
-				$inpercenttwentyseven = $totaltwentyseven * 100 / ($twentysevencounter * 4);
-
+				$inpercenttwentyseven = $totaltwentyseven * 100 / ($result->subject * 4);
 				$gradetwentyseven = $this->calculateGrade($inpercenttwentyseven);
 			}
 			if ($result->twentyeight > 0) {
-
 				$totaltwentyeight += $result->twentyeight;
-
-				$twentyeightcounter++;
-
-				$inpercenttwentyeight = $totaltwentyeight * 100 / ($twentyeightcounter * 4);
-
+				$inpercenttwentyeight = $totaltwentyeight * 100 / ($result->subject * 4);
 				$gradetwentyeight = $this->calculateGrade($inpercenttwentyeight);
 			}
 			if ($result->twentynine > 0) {
-
 				$totaltwentynine += $result->twentynine;
-
-				$twentyninecounter++;
-
-				$inpercenttwentynine = $totaltwentynine * 100 / ($twentyninecounter * 4);
-
+				$inpercenttwentynine = $totaltwentynine * 100 / ($result->subject * 4);
 				$gradetwentynine = $this->calculateGrade($inpercenttwentynine);
 			}
 			if ($result->thirty > 0) {
-
 				$totalthirty += $result->thirty;
-
-				$thirtycounter++;
-
-				$inpercentthirty = $totalthirty * 100 / ($thirtycounter * 4);
-
+				$inpercentthirty = $totalthirty * 100 / ($result->subject * 4);
 				$gradethirty = $this->calculateGrade($inpercentthirty);
 			}
 			if ($result->thirtyone > 0) {
-
 				$totalthirtyone += $result->thirtyone;
-
-				$thirtyonecounter++;
-
-				$inpercentthirtyone = $totalthirtyone * 100 / ($thirtyonecounter * 4);
-
+				$inpercentthirtyone = $totalthirtyone * 100 / ($result->subject * 4);
 				$gradethirtyone = $this->calculateGrade($inpercentthirtyone);
 			}
-
 		}
-
 		return view('results/result_per_day', compact(
-			'indivisual_results',
-			'subjects',
+			'total_indivisual_results',
 			'months',
 			'totalone',
 			'totaltwo',
@@ -759,21 +497,14 @@ class SearchResult extends Controller {
 			'gradetwentynine',
 			'gradethirty',
 			'gradethirtyone'
-
 			));
 	}
-
-
 	/**
 	 * Calculation of Total Marks
 	 */
-
 	public function calculateTotalMarks($results) {
-
 		$total_marks = 0;
-
 		foreach ($results as $result) {
-
 			$total_marks = $result->one +
 			$result->two +
 			$result->three +
@@ -806,56 +537,16 @@ class SearchResult extends Controller {
 			$result->thirty +
 			$result->thirtyone;
 		}
-
 		return $total_marks;
 	}
-
 	public function calculateInPercent($total_marks, $results) {
-
 		foreach ($results as $result) {
-
-			$total_subjects = $result->subject_one +
-			$result->subject_two +
-			$result->subject_three +
-			$result->subject_four +
-			$result->subject_five +
-			$result->subject_six +
-			$result->subject_seven +
-			$result->subject_eight +
-			$result->subject_nine +
-			$result->subject_ten +
-			$result->subject_eleven +
-			$result->subject_twelve +
-			$result->subject_thirteen +
-			$result->subject_fourteen +
-			$result->subject_fifteen +
-			$result->subject_sixteen +
-			$result->subject_seventeen +
-			$result->subject_eighteen +
-			$result->subject_nineteen +
-			$result->subject_twenty +
-			$result->subject_twentyone +
-			$result->subject_twentytwo +
-			$result->subject_twentythree +
-			$result->subject_twentyfour +
-			$result->subject_twentyfive +
-			$result->subject_twentysix +
-			$result->subject_twentyseven +
-			$result->subject_twentyeight +
-			$result->subject_twentynine +
-			$result->subject_thirty +
-			$result->subject_thirtyone;
+			$gross_marks = $result->total_subject * 4;
+			$in_percent = ($total_marks * 100) / $gross_marks;
+			return $in_percent;
 		}
-
-		$gross_marks = $total_subjects * 4;
-
-		$in_percent = ($total_marks * 100) / $gross_marks;
-
-		return $in_percent;
 	}
-
 	public function calculateGrade($in_percent) {
-
 		if ($in_percent>=91 && $in_percent<=100) {
 			$grade = 'A++';
 		}elseif ($in_percent>=81 && $in_percent<91) {
@@ -871,63 +562,45 @@ class SearchResult extends Controller {
 		}else{
 			$grade = 'w/g';
 		}
-
 		return $grade;
 	}
-
-
 		/*$gradecalc = $in_percent / 10;
-
 		settype($gradecalc, "integer");
-
 		switch ($gradecalc) {
-
 			case 10:
 			$grade = 'A++';
 			break;
-
 			case 9:
 			$grade = 'A++';
 			break;
-
 			case 8:
 			$grade = 'A+';
 			break;
-
 			case 7:
 			$grade = 'A';
 			break;
-
 			case 6:
 			$grade = 'A-';
 			break;
-
 			case 5:
 			$grade = 'B';
 			break;
-
 			case 4:
 			$grade = 'C';
 			break;
-
 			case 3:
 			$grade = 'C';
 			break;
-
 			case 2:
 			$grade = 'C';
 			break;
-
 			case 1:
 			$grade = 'C';
 			break;
-
 			default:
 			$grade = 'w/g';
 			break;
 		}
-
 		return $grade;
 	}*/
-
 }
