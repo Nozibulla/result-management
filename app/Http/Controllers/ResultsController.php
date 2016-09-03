@@ -811,6 +811,7 @@ public function resultByDateBatch(Request $request)
 		$i = 0;
 		$student = null;
 		foreach ($results as $result) {
+
 			// return $result->total_subject;
 			$total_marks = $result->one +
 			$result->two +
@@ -848,7 +849,7 @@ public function resultByDateBatch(Request $request)
 			$gross_marks = $result->total_subject * 4;
 			// return $gross_marks;
 			$in_percent = ($total_marks * 100) / $gross_marks;
-			if ($in_percent < 60) {
+			if ($in_percent < 71) {
 				$student[$i]['total_marks'] = $total_marks;
 				$student[$i]['name'] = $result->name;
 				$student[$i]['roll'] = $result->roll;
