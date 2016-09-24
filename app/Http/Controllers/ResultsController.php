@@ -1082,7 +1082,7 @@ foreach ($total_indivisual_results as $result) {
 	}
 	if ($result->four > 0) {
 		$totalfour += $result->four;
-		$fourcounter++;
+		// $fourcounter++;
 		$inpercentfour = $totalfour * 100 / ($result->subject * 4);
 		$gradefour = $this->calculateGrade($inpercentfour);
 	}

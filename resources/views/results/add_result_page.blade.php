@@ -160,7 +160,7 @@
 
 										{!! Form::hidden('student_id', $student->id,['class'=> 'id']) !!}
 										{!! Form::hidden('month', 'January',['class'=> 'getmonth']) !!}
-										{!! Form::hidden('subject', 'Bangla',['class'=> 'getsubject']) !!}
+										{!! Form::hidden('subject', '1',['class'=> 'getsubject']) !!}
 										{!! Form::hidden('tarikh', '1',['class'=> 'gettarikh']) !!}
 
 										{!! Form::text('marks', null, ['class' => 'form-control', 'required' => 'required']) !!}
